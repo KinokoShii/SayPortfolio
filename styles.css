@@ -288,19 +288,19 @@ span.white {
 span.animatedPMargin {
   animation: growMarginAnimatedPMargin linear both;
   animation-timeline: scroll();
-  animation-range: 95% 100%;
+  animation-range: 90% 100%;
 }
 
 .appImg1 {
   animation: growMarginAppImg1 linear both;
   animation-timeline: scroll();
-  animation-range: 95% 100%;
+  animation-range: 90% 100%;
 }
 
 .yo {
   animation: growMarginYo linear both;
   animation-timeline: scroll();
-  animation-range: 95% 100%;
+  animation-range: 90% 100%;
 }
 
 @keyframes growMarginAppImg1 {
@@ -338,3 +338,4 @@ span.animatedPMargin {
   }
 }
     
+
