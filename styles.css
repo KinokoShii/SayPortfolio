@@ -33,7 +33,6 @@ body {
   align-items: center;
   padding: 0%;
   margin-top: 0.4%;
-  
 }
 
 .location {
@@ -176,8 +175,6 @@ body {
   will-change: left, transform;
 }
 
-
-
 .video1 img {
   width: 100%;
   height: auto;
@@ -197,7 +194,8 @@ body {
 .videoZone {
   height: 140vh;
   width: 100vw;
-
+  display: flex;
+  justify-content: center;
   z-index: -1;
 }
 
@@ -205,48 +203,138 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: start;
   color: black;
 }
 
 .subContent {
-  margin-top: 6%;
-  margin-left: 5%;
+  display: flex;
+  margin-top: 2%;
+  display: flex;
+  align-items: start;
+  width: 100vw;
+  justify-content: space-between;
+  
+  
 }
 
 .aboutMe {
   font-family: "Saans", sans-serif;
-  font-size: 24px;
+  font-size: 1rem;
+  display: flex;
+  line-height: 120%;
+  color: #989898;
+  margin-left: 2vw;
+  margin: 6vh;
 }
 
 .paragraph2 {
-  text-align: left;
-  font-size: 3.4rem;
-  margin-top: -5%;
-  line-height: 60px;
+  font-size: 3rem;
   display: flex;
-  width: 100vw;
-  justify-content: space-between;
-}
-
-.paragraph2 img {
-  margin-right: 7%;
-  width: 33%;
+  width: 60vw;
+  line-height: 120%;
+  align-self: flex-end;
 }
 
 .videoTxt {
   position: absolute;
-  bottom: -108vh;
-  left: 30%;
-  transform: translateX(-50%);
+  
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 0 auto;
+  top: 200vh;
   color: white;
-  text-align: center;
-  font-size: 2rem;
+  text-align: start;
+  font-size: 1rem;
   font-weight: 500;
   z-index: -1;
   color: #fafafa;
+  align-items: center;
+}
+
+.videoTxt p {
+  margin: 0.2rem 0;
+  width: 980px;
+  text-transform: uppercase;
+  color: #989898;
 }
 
 span.gray {
   color: #3d3d3d;
 }
+
+.start-text {
+  text-align: start;
+  color: #FFFFFF;
+}
+
+span.white {
+  color: #FFFFFF;
+}
+
+.paragraph2 img {
+  width: 120px;
+  vertical-align: middle;
+  height: 60px;
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.05),0px 9px 9px 0px rgba(0, 0, 0, 0.04),0px 19px 12px 0px rgba(0, 0, 0, 0.03),0px 34px 14px 0px rgba(0, 0, 0, 0.01),0px 54px 15px 0px rgba(0, 0, 0, 0);
+  
+}
+
+.appImg2 {
+  margin-right: 0.5vw;
+}
+
+span.animatedPMargin {
+  animation: growMarginAnimatedPMargin linear both;
+  animation-timeline: scroll();
+  animation-range: 95% 100%;
+}
+
+.appImg1 {
+  animation: growMarginAppImg1 linear both;
+  animation-timeline: scroll();
+  animation-range: 95% 100%;
+}
+
+.yo {
+  animation: growMarginYo linear both;
+  animation-timeline: scroll();
+  animation-range: 95% 100%;
+}
+
+@keyframes growMarginAppImg1 {
+
+  from {
+    margin-left: 0vw;
+  }
+
+  to {
+    margin-left: 3vw;
+  }
+  
+}
+
+@keyframes growMarginAnimatedPMargin {
+
+  from {
+    margin-right: 0vw;
+  }
+
+  to {
+    margin-right: 3vw;
+  }
+  
+}
+
+@keyframes growMarginYo {
+
+  from {
+    margin-left: 0vw;
+  }
+
+  to {
+    margin-left: 1vw;
+  }
+}
+    
