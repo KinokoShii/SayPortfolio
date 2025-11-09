@@ -300,51 +300,58 @@ const itemCount = titles.length;
 if (!track || itemCount === 0) {
   console.warn("marketZone-track or title2 elements not found.");
 } else {
-  // First, set the initial state immediately (before any ScrollTrigger)
+  // Set the initial state for the titles (stacked on top of each other)
+  gsap.set(track, { yPercent: 0 });
   titles.forEach((title, i) => {
     gsap.set(title, {
-      yPercent: i * 50,
-      opacity: i === 0 ? 1 : 0.2,
+      yPercent: i * 50, // Stack them with a 50% vertical offset
+      opacity: i === 0 ? 1 : 0.2, // Make the first one active
       zIndex: titles.length - i
     });
   });
 
-  // Then create the main timeline
+  // Create a timeline that will be controlled by the scrollbar
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".marketZone",
-      start: "top-=10 top",
-      end: () => `+=${(itemCount+1) * window.innerHeight}`,
+      start: "top top",
+      // Give it plenty of scroll distance to play out.
+      // Adjust the multiplier (e.g., 1.5) to make the scroll longer or shorter.
+      end: () => `+=${itemCount * window.innerHeight * 1.5}`,
       pin: ".marketZone-inner",
-      scrub: 1,
-      anticipatePin: 1
+      scrub: 1.5, // A slightly higher scrub value feels nice with the pauses
+      invalidateOnRefresh: true,
     }
   });
 
-  // Create the main animation
+  // Loop through each title to create the animation steps
   titles.forEach((title, i) => {
-    // Animate all titles up to and including the current one
-    tl.to(titles.slice(0, i + 1), {
-      yPercent: (index) => (index - i - 1) * 100,
-      duration: 1,
-      ease: "none"
-    })
-    .to(titles, {
-      opacity: (index) => index === i ? 1 : 0.2,
-      duration: 0.5,
-      ease: "power1.inOut"
-    }, "<"); // Run opacity animation at the same time
+    // We don't need to do anything for the very last title, as nothing comes after it.
+    if (i < itemCount - 1) {
+      // 1. ADD THE PAUSE (THE "LOCK")
+      // This is a "do nothing" animation that takes up space on the timeline.
+      // The duration here is relative to the other durations. A larger number means a longer scroll-pause.
+      tl.to({}, { duration: 2 });
 
-    // Add a pause between movements
-    if (i < titles.length - 1) {
-      tl.to({}, { duration: 0.5 }); // shorter hold for smoother transitions
+      // 2. ADD THE MOVEMENT
+      // Animate the entire track up to bring the *next* title (i + 1) into the active position.
+      tl.to(track, {
+        yPercent: -50 * (i + 1),
+        duration: 2, // This is the duration of the scroll movement
+        ease: "power1.inOut"
+      })
+      // 3. FADE THE TITLES
+      // Simultaneously, fade the titles' opacity. The "<" means "start at the same time as the previous animation".
+      .to(titles, {
+        opacity: (index) => (index === i + 1 ? 1 : 0.2),
+        duration: 1.5,
+        ease: "power1.inOut"
+      }, "<");
     }
   });
-
-  // Handle resize
-  ScrollTrigger.addEventListener("refreshInit", () => {
-    ScrollTrigger.refresh(true);
-  });
+  
+  // Add a final pause so the last item also gets its "lock" time
+  tl.to({}, { duration: 2 });
 }
 
  
