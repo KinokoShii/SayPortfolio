@@ -193,8 +193,70 @@ window.addEventListener("scroll", () => {
   }
 });
 
+// Cursor-follow divider for .imgZone2
+(function () {
+  const container = document.querySelector(".imgZone2");
+  const left = document.getElementById("imgLeft");
+  const right = document.getElementById("imgRight");
+  if (!container || !left || !right) return; // nothing to do
+
+  // Ensure a divider exists (CSS already styles .divider)
+  let divider = container.querySelector(".divider");
+  if (!divider) {
+    divider = document.createElement("div");
+    divider.className = "divider";
+    container.appendChild(divider);
+  }
+
+  let raf = null;
+
+  function handlePointerMove(e) {
+    // Support touch and mouse/pointer events
+    const clientX = e.touches
+      ? e.touches[0].clientX
+      : e.clientX ||
+        (e.changedTouches &&
+          e.changedTouches[0] &&
+          e.changedTouches[0].clientX);
+    if (clientX == null) return;
+    const rect = container.getBoundingClientRect();
+    // x relative to container, clamped
+    let x = clientX - rect.left;
+    x = Math.max(0, Math.min(rect.width, x));
+
+    // throttle visual updates to animation frames
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const dividerWidth = divider.offsetWidth || 6;
+      // set pixel widths so the divider edge follows the cursor
+      left.style.width = `${x}px`;
+      right.style.width = `${Math.max(0, Math.round(rect.width - x))}px`;
+      // position divider so its center aligns with the cursor
+      divider.style.left = `${Math.max(0, x - dividerWidth / 2)}px`;
+      raf = null;
+    });
+  }
+
+  function resetToHalf() {
+    // Clearing inline widths lets the CSS 50% rule take over (with transition)
+    left.style.width = "";
+    right.style.width = "";
+    divider.style.left = "";
+  }
+
+  // Use pointer events where available, with mouse/touch fallbacks
+  container.addEventListener("pointermove", handlePointerMove);
+  container.addEventListener("mousemove", handlePointerMove);
+  container.addEventListener("touchmove", handlePointerMove, { passive: true });
+
+  container.addEventListener("pointerleave", resetToHalf);
+  container.addEventListener("mouseleave", resetToHalf);
+  container.addEventListener("touchend", resetToHalf);
+})();
+
 window.addEventListener("scroll", () => {
   const body = document.querySelector("body");
+  const root = document.documentElement;
   const videoZone = document.getElementById("videoZone");
   const under = document.querySelector(".under");
   if (!videoZone) return;
@@ -203,25 +265,86 @@ window.addEventListener("scroll", () => {
 
   // Calculate how far you've scrolled *through* .videoZone
   const progress = Math.min(Math.max(1 - rect.top / windowHeight, 0), 1);
-  // Ease slightly for smoother feel
   const eased = Math.pow(progress, 1.4);
-  // Base grayscale value (255 -> 0)
   const grayValue = Math.round(255 * (1 - eased));
 
-  // If there's an .under section, compute how much it has entered the viewport
-  // and blend the grayscale toward white accordingly.
+  // Compute under section progress
   let underProgress = 0;
   if (under) {
     const underRect = under.getBoundingClientRect();
-    // underProgress: 0 when .under top is below viewport, 1 when fully inside (top <= 0)
     underProgress = Math.min(
       Math.max((windowHeight - underRect.top) / windowHeight, 0),
       1
     );
-    underProgress = Math.pow(underProgress, 1.2); // slight easing
+    underProgress = Math.pow(underProgress, 1.2);
   }
 
-  // Mix grayscale -> white based on underProgress
+  // Final color value for body
   const finalValue = Math.round(grayValue + (255 - grayValue) * underProgress);
+
+  // Update body background and store the color as a CSS variable
   body.style.backgroundColor = `rgb(${finalValue}, ${finalValue}, ${finalValue})`;
+  root.style.setProperty(
+    "--current-bg",
+    `rgb(${finalValue}, ${finalValue}, ${finalValue})`
+  );
 });
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Pick elements
+const track = document.querySelector(".marketZone-track");
+const titles = gsap.utils.toArray(".marketZone-track .title2");
+const itemCount = titles.length;
+
+if (!track || itemCount === 0) {
+  console.warn("marketZone-track or title2 elements not found.");
+} else {
+  // First, set the initial state immediately (before any ScrollTrigger)
+  titles.forEach((title, i) => {
+    gsap.set(title, {
+      yPercent: i * 50,
+      opacity: i === 0 ? 1 : 0.2,
+      zIndex: titles.length - i
+    });
+  });
+
+  // Then create the main timeline
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".marketZone",
+      start: "top-=10 top",
+      end: () => `+=${(itemCount+1) * window.innerHeight}`,
+      pin: ".marketZone-inner",
+      scrub: 1,
+      anticipatePin: 1
+    }
+  });
+
+  // Create the main animation
+  titles.forEach((title, i) => {
+    // Animate all titles up to and including the current one
+    tl.to(titles.slice(0, i + 1), {
+      yPercent: (index) => (index - i - 1) * 100,
+      duration: 1,
+      ease: "none"
+    })
+    .to(titles, {
+      opacity: (index) => index === i ? 1 : 0.2,
+      duration: 0.5,
+      ease: "power1.inOut"
+    }, "<"); // Run opacity animation at the same time
+
+    // Add a pause between movements
+    if (i < titles.length - 1) {
+      tl.to({}, { duration: 0.5 }); // shorter hold for smoother transitions
+    }
+  });
+
+  // Handle resize
+  ScrollTrigger.addEventListener("refreshInit", () => {
+    ScrollTrigger.refresh(true);
+  });
+}
+
+ 
