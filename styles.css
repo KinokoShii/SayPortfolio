@@ -120,6 +120,7 @@ body {
   text-align: left;
   margin: 0 auto;
   padding: 0;
+  z-index: 10;
 }
 .progress {
   margin-top: 4px;
@@ -200,7 +201,7 @@ body {
 }
 
 .under {
-  height: 100vh;
+  height: 70vh;
   display: flex;
   flex-direction: column;
   color: black;
@@ -213,8 +214,6 @@ body {
   align-items: start;
   width: 100vw;
   justify-content: space-between;
-  
-  
 }
 
 .aboutMe {
@@ -228,16 +227,20 @@ body {
 }
 
 .paragraph2 {
-  font-size: 3rem;
+  font-size: 4.5rem;
   display: flex;
-  width: 60vw;
-  line-height: 120%;
+  width: 80vw;
+  line-height: 100%;
   align-self: flex-end;
+  margin: 0;
+  position: absolute;
+  right: -60px;
+  top: 240vh;
+  font-weight: 600;
 }
 
 .videoTxt {
   position: absolute;
-  
   display: flex;
   flex-direction: column;
   width: 80%;
@@ -265,11 +268,11 @@ span.gray {
 
 .start-text {
   text-align: start;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 span.white {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .paragraph2 img {
@@ -277,8 +280,9 @@ span.white {
   vertical-align: middle;
   height: 60px;
   border-radius: 20px;
-  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.05),0px 9px 9px 0px rgba(0, 0, 0, 0.04),0px 19px 12px 0px rgba(0, 0, 0, 0.03),0px 34px 14px 0px rgba(0, 0, 0, 0.01),0px 54px 15px 0px rgba(0, 0, 0, 0);
-  
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.05),
+    0px 9px 9px 0px rgba(0, 0, 0, 0.04), 0px 19px 12px 0px rgba(0, 0, 0, 0.03),
+    0px 34px 14px 0px rgba(0, 0, 0, 0.01), 0px 54px 15px 0px rgba(0, 0, 0, 0);
 }
 
 .appImg2 {
@@ -288,7 +292,7 @@ span.white {
 span.animatedPMargin {
   animation: growMarginAnimatedPMargin linear both;
   animation-timeline: scroll();
-  animation-range: 90% 100%;
+  animation-range: 95% 100%;
 }
 
 .appImg1 {
@@ -304,7 +308,6 @@ span.animatedPMargin {
 }
 
 @keyframes growMarginAppImg1 {
-
   from {
     margin-left: 0vw;
   }
@@ -312,11 +315,9 @@ span.animatedPMargin {
   to {
     margin-left: 3vw;
   }
-  
 }
 
 @keyframes growMarginAnimatedPMargin {
-
   from {
     margin-right: 0vw;
   }
@@ -324,11 +325,9 @@ span.animatedPMargin {
   to {
     margin-right: 3vw;
   }
-  
 }
 
 @keyframes growMarginYo {
-
   from {
     margin-left: 0vw;
   }
@@ -337,5 +336,277 @@ span.animatedPMargin {
     margin-left: 1vw;
   }
 }
-    
 
+.underFooter {
+  font-family: "Saans", sans-serif;
+  text-decoration: underline;
+  /* Use the body's background color as the starting point */
+  background: linear-gradient(
+    to bottom,
+    var(--current-bg, #ffffff) 0%,
+    color-mix(in srgb, var(--current-bg, #f6f6f6) 80%, #000 7%) 100%
+  );
+  width: 100%;
+  height: 87vh;
+  display: flex;
+  justify-content: center;
+  will-change: background;
+  transition: background 0.05s linear;
+}
+
+.underContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -20vh;
+  width: 100%;
+}
+
+.imgZone2 {
+  /* subtract the left+right margins (40px each) so the element doesn't overflow */
+  width: calc(100% - 80px);
+  display: flex;
+  justify-content: space-between;
+  gap: 0;
+  height: 700px;
+  align-items: stretch;
+  border-radius: 0;
+  margin: 0 40px;
+  position: relative; /* needed for divider */
+}
+
+.imgZone2 img {
+  margin: 0;
+}
+
+.imgLeft {
+  width: 50%;
+  background-color: #0b63ff; /* blue-ish */
+  height: 100%;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  border-radius: 15px 0 0 15px;
+}
+
+.imgRight {
+  width: 50%;
+  height: 100%;
+  background-color: #ff3b3b; /* red-ish */
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  border-radius: 0 15px 15px 0;
+}
+
+/* visible white divider between panels */
+.imgZone2 .divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #ffffff;
+  /* center by default (half of divider width = 3px) */
+  left: calc(50% - 3px);
+  z-index: 5;
+  pointer-events: none;
+  /* animate left to match the panels' width transition */
+  transition: left 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.underTxt {
+  text-align: end;
+  align-self: flex-end;
+  margin-right: 40px;
+}
+
+.work {
+  height: 127vh;
+  background: #f6f6f6;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.workHeader {
+  font-family: "Saans", sans-serif;
+  font-size: 2rem;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  text-wrap: wrap;
+}
+
+.workTitle {
+  display: flex;
+  font-size: 5rem;
+  width: 20%;
+  line-height: 120%;
+  font-weight: 700;
+  margin-left: 40px;
+}
+
+.workLink {
+  font-size: 1rem;
+  text-decoration: underline;
+  margin-right: 40px;
+  align-self: flex-end;
+  margin-top: 15%;
+}
+
+.workContent {
+  display: flex;
+  flex-direction: row;
+  margin-top: 0%;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 45%;
+  background: #292929;
+  border-radius: 20px;
+  color: #FFFFFF;
+  height: 87vh;
+}
+
+.cardImg {
+  margin-top: 3%;
+  width: 95%;
+}
+
+.cardImg img {
+  width: 100%;
+  border-radius: 20px 20px 0 0;
+}
+
+.cardTxt {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  width: 100%;
+  margin: 0 2%;
+}
+
+.workDescr {
+  margin: 0% 0% 0% 3%;
+  line-height: 60%;
+}
+
+.cardPurpose {
+  margin: 0% 3% 0% 0%;
+  text-align: end;
+  text-transform: uppercase;
+}
+
+.freeSpace {
+  height: 20vh;
+  width: 100vw;
+}
+
+.marketZone {
+  height: 400vh;
+  width: 100vw;
+}
+
+.marketZone-inner{
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  width: 100%;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.marketZone-track {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  font-size: 4rem;
+  line-height: 80%;
+  color: #000000;
+  font-weight: 700;
+  will-change: transform;
+  margin-left: 40px;
+}
+
+.marketZone-track p {
+  margin: 0;
+}
+
+
+
+.title2 {
+  transform: translateY(0);
+  transition: opacity 0.4s ease;
+  position: relative;
+  margin-left: 40px;
+}
+
+.title2.active {
+  opacity: 1;
+}
+
+.marketZonetext {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  top: 10vh;
+  left: 40px;
+  color: #000000;
+  text-align: start;
+  font-size: 1rem;
+  font-weight: 500;
+  z-index: 11;
+  top: 40vh;
+  font-size: 1.25rem;
+}
+
+.attributeTag {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  width: 30vw;
+  justify-content: start;
+  margin-left: 40px;
+  gap: 14px;
+  top: 70vh;
+}
+
+.tag {
+  color: #989898;
+  border: 1px solid #989898;
+  padding: 5px 10px;
+  border-radius: 15px;
+}
+
+.marketLink {
+  font-size: 1rem;
+  text-decoration: underline;
+  margin-right: 40px;
+  position: absolute;
+  left: 40px;
+  top: 90vh;
+}
+
+.marketImg {
+  position: absolute;
+  width: 35%;
+  height: auto;
+  right: 40px;
+  top: 10px;
+}
+
+.marketImg img {
+  width: 100%;
+  height: auto;
+}
