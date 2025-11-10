@@ -292,65 +292,126 @@ window.addEventListener("scroll", () => {
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Pick elements
+// --- 1. DEFINE YOUR DYNAMIC CONTENT (No changes here) ---
+const sectionContent = [
+  {
+    text: "I create visuals that are the first point of <br /> connection with audiences—guiding <br /> perception, communicating brand <br /> values, and building memorable, <br /> cohesive identities.",
+    tags: ["VISUAL IDENTITY", "PALETTES", "ICONOGRAPHY", "ILLUSTRATIONS", "TYPOGRAPHY"],
+    imageSrc: "assets/image106.svg"
+  },
+  {
+    text: " I help brands find their voice and <br /> purpose—shaping how they think, speak, <br />  and grow to build real, lasting  <br /> connections with their audiences.",
+    tags: ["CULTURE", "MARKET RESEARCH", "STORYTELLER", "AUDIENCE INSIGHT", "TREND"],
+    imageSrc: "assets/image107.svg"
+  },
+  {
+    text: " I design interfaces that feel intuitive and <br /> alive—turning complex systems into <br />  seamless experiences that connect <br />  people with purpose and ease.",
+    tags: ["UI DESIGN", "UX DESIGN", "INFORMATION ARCHITECHTURE", "PROTOTYPING", "INTERACTIONS"],
+    imageSrc: "assets/image108.svg"
+  }
+];
+
+// --- 2. GET REFERENCES TO THE DOM ELEMENTS (No changes here) ---
 const track = document.querySelector(".marketZone-track");
 const titles = gsap.utils.toArray(".marketZone-track .title2");
+const contentText = document.querySelector(".marketZonetext");
+const contentTags = document.querySelector(".attributeTag");
+const contentImage = document.querySelector(".marketImg img");
+const elementsToAnimate = [contentText, contentTags, contentImage];
 const itemCount = titles.length;
 
+// --- 3. CREATE THE CONTENT UPDATE FUNCTION ---
+// We add "overwrite: 'auto'" to prevent animations from fighting each other
+// during rapid scrolling.
+function updateContent(index) {
+  if (!sectionContent[index]) return;
+
+  const newContent = sectionContent[index];
+
+  gsap.to(elementsToAnimate, {
+    opacity: 0,
+    duration: 0.3,
+    ease: "power1.in",
+    overwrite: "auto", // This is important
+    onComplete: () => {
+      contentText.innerHTML = newContent.text;
+      contentImage.src = newContent.imageSrc;
+      contentTags.innerHTML = newContent.tags
+        .map(tag => `<div class="tag">${tag}</div>`)
+        .join("");
+
+      gsap.to(elementsToAnimate, {
+        opacity: 1,
+        duration: 0.4,
+        ease: "power1.out"
+      });
+    }
+  });
+}
+
+// --- 4. THE MAIN GSAP TIMELINE (WITH THE FIX) ---
 if (!track || itemCount === 0) {
   console.warn("marketZone-track or title2 elements not found.");
 } else {
-  // Set the initial state for the titles (stacked on top of each other)
   gsap.set(track, { yPercent: 0 });
   titles.forEach((title, i) => {
     gsap.set(title, {
-      yPercent: i * 50, // Stack them with a 50% vertical offset
-      opacity: i === 0 ? 1 : 0.2, // Make the first one active
+      yPercent: i * 50,
+      opacity: i === 0 ? 1 : 0.2,
       zIndex: titles.length - i
     });
   });
 
-  // Create a timeline that will be controlled by the scrollbar
+  // State variable to track the currently active section
+  let currentSection = 0;
+  updateContent(0); // Load initial content
+
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".marketZone",
       start: "top top",
-      // Give it plenty of scroll distance to play out.
-      // Adjust the multiplier (e.g., 1.5) to make the scroll longer or shorter.
       end: () => `+=${itemCount * window.innerHeight * 1.5}`,
       pin: ".marketZone-inner",
-      scrub: 1.5, // A slightly higher scrub value feels nice with the pauses
+      scrub: 1.5,
       invalidateOnRefresh: true,
+      // The onUpdate callback is the heart of the solution
+      onUpdate: self => {
+        // Get the timeline's progress and determine the active section
+        const progress = self.progress;
+        const sectionIndex = Math.floor(progress * (itemCount));
+
+        // Clamp the index to be safe
+        const clampedIndex = gsap.utils.clamp(0, itemCount - 1, sectionIndex);
+
+        // If the active section has changed, update the content
+        if (clampedIndex !== currentSection) {
+          currentSection = clampedIndex;
+          updateContent(currentSection);
+        }
+      }
     }
   });
 
-  // Loop through each title to create the animation steps
+  // Build the timeline for the VISUALS (titles and track) only.
+  // The content updates are now handled by onUpdate.
   titles.forEach((title, i) => {
-    // We don't need to do anything for the very last title, as nothing comes after it.
     if (i < itemCount - 1) {
-      // 1. ADD THE PAUSE (THE "LOCK")
-      // This is a "do nothing" animation that takes up space on the timeline.
-      // The duration here is relative to the other durations. A larger number means a longer scroll-pause.
-      tl.to({}, { duration: 2 });
+      tl.to({}, { duration: 2 }); // Pause
 
-      // 2. ADD THE MOVEMENT
-      // Animate the entire track up to bring the *next* title (i + 1) into the active position.
       tl.to(track, {
-        yPercent: -50 * (i + 1),
-        duration: 2, // This is the duration of the scroll movement
-        ease: "power1.inOut"
-      })
-      // 3. FADE THE TITLES
-      // Simultaneously, fade the titles' opacity. The "<" means "start at the same time as the previous animation".
-      .to(titles, {
-        opacity: (index) => (index === i + 1 ? 1 : 0.2),
-        duration: 1.5,
-        ease: "power1.inOut"
-      }, "<");
+          yPercent: -50 * (i + 1),
+          duration: 3,
+          ease: "power1.inOut"
+        })
+        .to(titles, {
+          opacity: (index) => (index === i + 1 ? 1 : 0.2),
+          duration: 1.5,
+          ease: "power1.inOut"
+        }, "<");
     }
   });
-  
-  // Add a final pause so the last item also gets its "lock" time
+
+  // Add a final pause for the last item
   tl.to({}, { duration: 2 });
 }
 
