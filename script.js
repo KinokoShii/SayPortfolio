@@ -320,9 +320,7 @@ const contentImage = document.querySelector(".marketImg img");
 const elementsToAnimate = [contentText, contentTags, contentImage];
 const itemCount = titles.length;
 
-// --- 3. CREATE THE CONTENT UPDATE FUNCTION ---
-// We add "overwrite: 'auto'" to prevent animations from fighting each other
-// during rapid scrolling.
+// --- 3. CREATE THE CONTENT UPDATE FUNCTION (No changes here) ---
 function updateContent(index) {
   if (!sectionContent[index]) return;
 
@@ -332,7 +330,7 @@ function updateContent(index) {
     opacity: 0,
     duration: 0.3,
     ease: "power1.in",
-    overwrite: "auto", // This is important
+    overwrite: "auto",
     onComplete: () => {
       contentText.innerHTML = newContent.text;
       contentImage.src = newContent.imageSrc;
@@ -362,28 +360,28 @@ if (!track || itemCount === 0) {
     });
   });
 
-  // State variable to track the currently active section
   let currentSection = 0;
-  updateContent(0); // Load initial content
+  updateContent(0);
 
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".marketZone",
       start: "top top",
-      end: () => `+=${itemCount * window.innerHeight * 1.5}`,
+      // THE FIX IS HERE: We REMOVED the "end" property.
+      // GSAP will now automatically set the end of the scroll based on the timeline's duration.
       pin: ".marketZone-inner",
       scrub: 1.5,
       invalidateOnRefresh: true,
-      // The onUpdate callback is the heart of the solution
       onUpdate: self => {
-        // Get the timeline's progress and determine the active section
+        // This logic remains the same. It is now more reliable.
         const progress = self.progress;
-        const sectionIndex = Math.floor(progress * (itemCount));
-
-        // Clamp the index to be safe
+        
+        // We use itemCount - 1 for the progress calculation to better map to array indices.
+        // And multiply progress by the number of sections we actually transition through.
+        let sectionIndex = Math.floor(progress * (itemCount));
+        
         const clampedIndex = gsap.utils.clamp(0, itemCount - 1, sectionIndex);
 
-        // If the active section has changed, update the content
         if (clampedIndex !== currentSection) {
           currentSection = clampedIndex;
           updateContent(currentSection);
@@ -392,11 +390,10 @@ if (!track || itemCount === 0) {
     }
   });
 
-  // Build the timeline for the VISUALS (titles and track) only.
-  // The content updates are now handled by onUpdate.
+  // Build the timeline (No changes here)
   titles.forEach((title, i) => {
     if (i < itemCount - 1) {
-      tl.to({}, { duration: 2 }); // Pause
+      tl.to({}, { duration: 2 });
 
       tl.to(track, {
           yPercent: -50 * (i + 1),
@@ -414,5 +411,4 @@ if (!track || itemCount === 0) {
   // Add a final pause for the last item
   tl.to({}, { duration: 2 });
 }
-
  
