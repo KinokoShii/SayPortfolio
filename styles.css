@@ -469,7 +469,7 @@ span.animatedPMargin {
   width: 45%;
   background: #292929;
   border-radius: 20px;
-  color: #FFFFFF;
+  color: #ffffff;
   height: 87vh;
 }
 
@@ -513,7 +513,7 @@ span.animatedPMargin {
   width: 100vw;
 }
 
-.marketZone-inner{
+.marketZone-inner {
   display: flex;
   flex-direction: row;
   align-items: start;
@@ -526,6 +526,7 @@ span.animatedPMargin {
 }
 
 .marketZone-track {
+  margin-top: 5vh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -541,8 +542,6 @@ span.animatedPMargin {
 .marketZone-track p {
   margin: 0;
 }
-
-
 
 .title2 {
   transform: translateY(0);
@@ -575,7 +574,7 @@ span.animatedPMargin {
   position: absolute;
   display: flex;
   flex-wrap: wrap;
-  width: 34vw;
+  width: 33vw;
   justify-content: start;
   margin-left: 40px;
   gap: 14px;
@@ -603,7 +602,7 @@ span.animatedPMargin {
   width: 35%;
   height: auto;
   right: 40px;
-  top: 10px;
+  top: 5vh;
 }
 
 .marketImg img {
@@ -611,3 +610,180 @@ span.animatedPMargin {
   height: auto;
 }
 
+.gallery {
+  display: grid;
+  grid-template-areas:
+    "Zone1 Zone1 Zone2 Zone3"
+    "Zone4 Zone5 Zone5 Zone6";
+  grid-template-columns: 25% 25% 25% 25%;
+  width: 100%;
+  height: 100vh;
+}
+
+.zoneImg {
+  width: 100%;
+  height: 100%;
+  background: #989898;
+}
+
+.zone1 {
+  grid-area: Zone1;
+  margin: 40px 0 20px 40px;
+}
+
+.zone2 {
+  grid-area: Zone2;
+  margin: 40px 0 20px 20px;
+}
+.zone3 {
+  grid-area: Zone3;
+  margin: 40px 40px 20px 20px;
+}
+.zone4 {
+  grid-area: Zone4;
+  margin: 0px 0px 60px 40px;
+}
+.zone5 {
+  grid-area: Zone5;
+  margin: 0px 0px 60px 20px;
+}
+.zone6 {
+  grid-area: Zone6;
+  margin: 0px 40px 60px 20px;
+}
+
+.galleryImgZone {
+  overflow: hidden;
+  opacity: 0.5;
+  border-radius: 15px;
+}
+
+.getInTouch {
+  height: 25vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.separation {
+  width: 100%;
+  height: 2px;
+  background: #989898;
+}
+
+.getInTxt {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.mainTxt {
+  margin-left: 40px;
+  font-weight: 700;
+  font-size: 4rem;
+}
+
+.mail {
+  margin-right: 40px;
+  font-weight: 500;
+  text-decoration: underline;
+  font-size: 4rem;
+}
+
+.credits {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.creditsTxt {
+  margin-left: 40px;
+  font-size: 1.25rem;
+  color: #989898;
+}
+
+.circle-chevron-icon-down {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background-color: #000000;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.circle-chevron-icon-down::before,
+.circle-chevron-icon-down::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: white;
+  top: 25px;
+}
+
+.circle-chevron-icon-down::before {
+  left: 25px;
+  transform: rotate(-130deg);
+}
+
+.circle-chevron-icon-down::after {
+  right: 25px;
+  transform: rotate(130deg);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 30vh;
+}
+
+.shortcuts {
+  display: flex;
+  gap: 40px;
+  justify-content: space-around;
+  align-items: center;
+  height: 100px;
+}
+
+.shortcutsButton{ 
+  font-weight: 700;
+  font-size: 3.8rem;
+}
+
+.shortcutsImg {
+  width: 90px;
+  height: 90px;
+  display: flex;
+}
+
+.rights {
+  font-size: 1rem;
+  color: #989898;
+  display: flex;
+  width: 100%;
+  margin-top: -3vh;
+}
+
+.version {
+  margin-left: 40px;
+}
+
+.rightsTxt {
+  margin-right: 40px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+}
+
+.freeSpace1 {
+  height: 5vh;
+}
