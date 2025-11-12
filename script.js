@@ -55,18 +55,13 @@ function handleMouse(e) {
   const rect = video.getBoundingClientRect();
   const halfWidth = rect.width / 2;
 
-  // Cursor position relative to container
   let x = e.clientX - containerRect.left - halfWidth;
 
-  // Clamp to container boundaries
   const minX = 0;
   const maxX = containerRect.width - rect.width;
   x = Math.max(minX, Math.min(x, maxX));
 
-  // Center position
   const centerX = (containerRect.width - rect.width) / 2;
-
-  // Gradually reduce horizontal movement
   targetX = centerX + (x - centerX) * movementFactor;
 }
 document.addEventListener("mousemove", handleMouse);
@@ -79,25 +74,48 @@ function animate() {
   requestAnimationFrame(animate);
 }
 animate();
-// Initialize currentX/targetX from computed position to avoid jump
+
 const initialRect = video.getBoundingClientRect();
 currentX = initialRect.left;
 targetX = currentX;
-// initial/target widths for progressive scaling
 let initialWidth = video.offsetWidth;
 let targetWidthPx = Math.round(window.innerWidth * 0.55);
 
-// update targetWidth on resize
+// --- REFRESH FIX ---
+// This self-executing function runs once on page load.
+(function() {
+    const videoZone = document.getElementById("videoZone");
+    // If the elements don't exist yet, do nothing.
+    if (!videoZone || !video) return;
+
+    // The 'snapPoint' is the scroll position where the animation ends.
+    // It's the distance from the top of the document to the top of the videoZone.
+    const snapPoint = videoZone.offsetTop;
+
+    // If the page is loaded scrolled past this point...
+    if (window.scrollY > snapPoint) {
+        // ...then we immediately put the video into its final state.
+        locked = true;
+        snapped = true;
+        document.removeEventListener("mousemove", handleMouse);
+
+        video.style.position = "absolute";
+        video.style.width = "55vw";
+        video.style.left = "50%";
+        // The final 'top' position is the snapPoint plus the 20% viewport offset.
+        video.style.top = `${snapPoint + (window.innerHeight * 0.2)}px`;
+        video.style.transform = "translateX(-50%)";
+        video.classList.add("centered");
+    }
+})();
+// --- END REFRESH FIX ---
+
 window.addEventListener("resize", () => {
   targetWidthPx = Math.round(window.innerWidth * 0.55);
 });
 
 window.addEventListener("scroll", () => {
   const scrollY = window.scrollY || window.pageYOffset;
-
-  // Note: keep handling even when snapped so we can detect unsnap (rect.top > 0)
-
-  // compute videoZone progress early so we can use it to scale width progressively
   const videoZone = document.getElementById("videoZone");
   const windowHeight = window.innerHeight;
   let progress = 0;
@@ -107,38 +125,31 @@ window.addEventListener("scroll", () => {
     progress = Math.min(Math.max(1 - rect.top / windowHeight, 0), 1);
   }
 
-  // On first scroll, center the video and lock mouse interaction
   if (scrollY > 0 && !video.classList.contains("centered")) {
     video.classList.add("centered");
-    locked = true; // stops mousemove/animate from changing left
-    // center horizontally using left 50% + translateX(-50%)
+    locked = true;
     video.style.left = "50%";
     video.style.transform = "translateX(-50%)";
-    // remove mouse listener so cursor can't move it anymore
     document.removeEventListener("mousemove", handleMouse);
-    // capture sizes for scaling
     initialWidth = video.offsetWidth || initialWidth;
     targetWidthPx = Math.round(window.innerWidth * 0.55);
   }
 
-  // If scrolled back to top, restore original state
   if (scrollY === 0 && video.classList.contains("centered")) {
     video.classList.remove("centered");
     locked = false;
-    // reset inline styles so CSS base position takes over
+    snapped = false; // Also reset the snapped state
     video.style.removeProperty("left");
     video.style.removeProperty("transform");
     video.style.removeProperty("position");
     video.style.removeProperty("top");
-    // reset currentX/targetX so animate resumes smoothly
+    video.style.removeProperty("width"); // Also reset width
     const rect = video.getBoundingClientRect();
     currentX = rect.left;
     targetX = currentX;
-    // reattach mouse handler so it can be moved again
     document.addEventListener("mousemove", handleMouse);
   }
 
-  // While centered but not yet snapped, progress width from initialWidth → targetWidthPx
   if (video.classList.contains("centered") && !snapped) {
     const widthPx = Math.round(
       initialWidth + (targetWidthPx - initialWidth) * progress
@@ -146,31 +157,25 @@ window.addEventListener("scroll", () => {
     video.style.width = `${widthPx}px`;
   }
 
-  // Check videoZone to snap to absolute final position (when its top reaches viewport top)
   if (videoZone && rect) {
     const fixedY = window.innerHeight * 0.2;
-    // Snap when videoZone reaches top
     if (rect.top <= 0 && !snapped) {
       snapped = true;
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const absoluteY = scrollTop + fixedY;
 
-      // Temporarily disable transitions and set all final styles instantly
       video.classList.add("no-transition");
       video.style.position = "absolute";
       video.style.left = "50%";
       video.style.top = `${absoluteY}px`;
       video.style.transform = "translateX(-50%)";
       video.style.width = "55vw";
-      // force reflow then re-enable transitions after a short delay so layout settles
       void video.offsetWidth;
       setTimeout(() => video.classList.remove("no-transition"), 40);
 
-      // Unsnap: when videoZone moves down again (user scrolls back up)
     } else if (rect.top > 0 && snapped) {
       snapped = false;
-      // Temporarily disable transitions and set fixed positioning/styles instantly
       video.classList.add("no-transition");
       video.style.position = "fixed";
       video.style.top = `${fixedY}px`;
@@ -184,10 +189,8 @@ window.addEventListener("scroll", () => {
       );
       video.style.width = `${widthPx}px`;
       video.style.transform = "translateX(-50%)";
-      // force reflow then re-enable transitions after a short delay so layout settles
       void video.offsetWidth;
       setTimeout(() => video.classList.remove("no-transition"), 40);
-      // keep locked = true (still centered and not movable by mouse)
       locked = true;
     }
   }
@@ -412,3 +415,18 @@ if (!track || itemCount === 0) {
   tl.to({}, { duration: 2 });
 }
  
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    document.querySelector(this.getAttribute("href")).scrollIntoView({
+      behavior: "smooth"
+    });
+  });
+});
+
+
+
+
+
+  
